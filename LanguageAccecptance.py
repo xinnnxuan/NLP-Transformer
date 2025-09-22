@@ -1,3 +1,13 @@
+"""
+Language Acceptance Task
+
+Created a classifier to identify whether strings belong to a formal language of 
+the form aⁿbⁿaⁿ. Generated and tested both valid and near-miss invalid strings. 
+Applied formal language theory and string pattern recognition.
+
+Key Skills: Regular language recognition, string classification, generative testing,
+            Python logic functions
+"""
 import random
 
 def generate_valid_string(min_n=1, max_n=5):
