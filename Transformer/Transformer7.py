@@ -1,8 +1,39 @@
-import torch
-import torch.nn as nn
+"""
+Advanced Transformer Implementation for a^n b^n a^n Language Classification
+
+This module implements a complete Transformer architecture specifically designed for
+classifying strings that belong to the context-free language a^n b^n a^n. It includes
+custom embedding layers, multi-head self-attention, positional encoding, and a
+comprehensive training and evaluation framework.
+
+Key Features:
+- Custom AnBnAnEmbedding for specialized token representation
+- Multi-head self-attention mechanism
+- Positional encoding for sequence understanding
+- Complete training pipeline with data generation
+- Comprehensive evaluation and testing framework
+
+Key Skills: PyTorch, Transformers, Attention Mechanisms, Language Classification, Deep Learning
+"""
+
+try:
+    import torch
+    import torch.nn as nn
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    print("Warning: PyTorch not available. Please install: pip install torch")
+
 import numpy as np
 
 class PositionalEncoding(nn.Module):
+    """
+    Positional encoding layer for Transformer models.
+    
+    This class implements the sinusoidal positional encoding used in the original
+    Transformer paper to provide position information to the model.
+    """
+
     def __init__(self, d_model, max_seq_length=100):
         """
         Initialize positional encoding
@@ -36,6 +67,14 @@ class PositionalEncoding(nn.Module):
         return self.pe[position]
 
 class AnBnAnEmbedding(nn.Module):
+    """
+    Custom embedding layer for a^n b^n a^n language classification.
+    
+    This embedding layer is specifically designed to handle the tokenization
+    and embedding of strings in the a^n b^n a^n language. It includes both
+    token embeddings and positional encoding.
+    """
+
     def __init__(self, d_model=64, max_seq_length=100):
         """
         Custom embedding for a^n b^n a^n language
@@ -132,6 +171,13 @@ class AnBnAnEmbedding(nn.Module):
         return embeddings
 
 class SelfAttention(nn.Module):
+    """
+    Multi-head self-attention mechanism.
+    
+    This class implements the scaled dot-product attention mechanism with
+    multiple attention heads as described in the Transformer paper.
+    """
+
     def __init__(self, d_model, num_heads=8, dropout=0.1):
         """
         Multi-head self-attention mechanism
@@ -243,6 +289,13 @@ class SelfAttention(nn.Module):
         return attention
 
 class FeedForward(nn.Module):
+    """
+    Feed-forward network used in Transformer blocks.
+    
+    This class implements the position-wise feed-forward network that is
+    applied to each position separately and identically.
+    """
+    
     def __init__(self, d_model, d_ff=256, dropout=0.1):
         """
         Feed-forward network used in Transformer
@@ -281,6 +334,13 @@ class FeedForward(nn.Module):
         return x
 
 class TransformerBlock(nn.Module):
+    """
+    Complete Transformer block including self-attention and feed-forward network.
+    
+    This class combines self-attention and feed-forward layers with residual
+    connections and layer normalization to form a complete Transformer block.
+    """
+    
     def __init__(self, d_model, num_heads=8, d_ff=256, dropout=0.1):
         """
         Complete Transformer block including self-attention and feed-forward network
@@ -328,6 +388,13 @@ class TransformerBlock(nn.Module):
         return x
 
 class Encoder(nn.Module):
+    """
+    Transformer Encoder for a^n b^n a^n language classification.
+    
+    This class implements a stack of Transformer blocks to form the encoder
+    component of the model.
+    """
+    
     def __init__(self, d_model, num_heads=4, d_ff=128, num_layers=2, dropout=0.1):
         """
         Transformer Encoder for a^n b^n a^n language
@@ -371,6 +438,13 @@ class Encoder(nn.Module):
         return x
 
 class AnBnAnClassifier(nn.Module):
+    """
+    Complete model for classifying if a string belongs to a^n b^n a^n language.
+    
+    This class combines the custom embedding layer, encoder stack, and classification
+    head to form the complete model for language classification.
+    """
+    
     def __init__(self, d_model=64, num_heads=4, d_ff=128, num_layers=2, dropout=0.1, max_seq_length=100):
         """
         Complete model for classifying if a string belongs to a^n b^n a^n language
@@ -492,7 +566,7 @@ def generate_training_data(num_samples=1000, max_n=10, valid_ratio=0.5):
 
     return texts, labels
 
-def train_model(model, num_epochs=10, batch_size=32, learning_rate=0.001):
+def train_model(model_instance, num_epochs=10, batch_size=32, learning_rate=0.001):
     """
     Train the a^n b^n a^n classifier
 
@@ -506,25 +580,25 @@ def train_model(model, num_epochs=10, batch_size=32, learning_rate=0.001):
         trained model and training history
     """
     # Set model to training mode
-    model.train()
+    model_instance.train()
 
     # Generate training data
     train_texts, train_labels = generate_training_data(num_samples=2000, max_n=15)
 
     # Create optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.Adam(model_instance.parameters(), lr=learning_rate)
 
     # Binary cross entropy loss
     criterion = nn.BCELoss()
 
     # Training history
-    history = {
+    training_history = {
         'loss': [],
         'accuracy': []
     }
 
-    # Number of batches
-    num_batches = len(train_texts) // batch_size
+    # Number of batches (commented out as it's not used)
+    # num_batches = len(train_texts) // batch_size
 
     print(f"Training model on {len(train_texts)} examples for {num_epochs} epochs...")
 
@@ -550,7 +624,7 @@ def train_model(model, num_epochs=10, batch_size=32, learning_rate=0.001):
             optimizer.zero_grad()
 
             # Forward pass
-            outputs = model(batch_texts)
+            outputs = model_instance(batch_texts)
 
             # Calculate loss
             loss = criterion(outputs, batch_labels)
@@ -570,14 +644,14 @@ def train_model(model, num_epochs=10, batch_size=32, learning_rate=0.001):
         epoch_accuracy = epoch_correct / total_samples
 
         # Save history
-        history['loss'].append(epoch_loss)
-        history['accuracy'].append(epoch_accuracy)
+        training_history['loss'].append(epoch_loss)
+        training_history['accuracy'].append(epoch_accuracy)
 
         # Print progress
         print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.4f}")
 
     print("Training complete!")
-    return model, history
+    return model_instance, training_history
 
 def generate_test_data(num_samples=2000, max_n=20):
     """
@@ -658,7 +732,7 @@ def generate_test_data(num_samples=2000, max_n=20):
 
     return texts, labels
 
-def evaluate_model_large_scale(model, batch_size=64):
+def evaluate_model_large_scale(model_instance, batch_size=64):
     """
     Evaluate model on a large number of test cases
 
@@ -666,7 +740,7 @@ def evaluate_model_large_scale(model, batch_size=64):
         model: trained model
         batch_size: batch size for evaluation
     """
-    model.eval()
+    model_instance.eval()
 
     # Generate large test set
     test_texts, test_labels = generate_test_data(num_samples=2000, max_n=20)
@@ -694,7 +768,7 @@ def evaluate_model_large_scale(model, batch_size=64):
             batch_labels = torch.tensor(test_labels[i:i+batch_size], dtype=torch.float32)
 
             # Get predictions
-            outputs = model(batch_texts)
+            outputs = model_instance(batch_texts)
             predictions = (outputs > 0.5).float()
 
             # Update metrics
@@ -703,7 +777,7 @@ def evaluate_model_large_scale(model, batch_size=64):
             total_samples += len(batch_texts)
 
             # Update pattern metrics
-            for j, (text, label, pred) in enumerate(zip(batch_texts, batch_labels, predictions)):
+            for _, (text, label, pred) in enumerate(zip(batch_texts, batch_labels, predictions)):
                 pattern_type = 'valid' if label == 1 else 'invalid'
                 pattern_metrics[pattern_type]['total'] += 1
                 if label == pred:
@@ -792,22 +866,23 @@ def generate_test_data_for_n(n, num_samples=100):
 
     return texts, labels
 
-def test_N(model, n, batch_size=32):
+def test_n(model_instance, n, batch_size=32):
     """
     Test the model specifically on strings with length parameter n
 
     Args:
-        model: trained AnBnAnClassifier model
+        model_instance: trained AnBnAnClassifier model
         n: the specific length parameter for a^n b^n a^n
         batch_size: batch size for evaluation
     """
-    model.eval()
+    model_instance.eval()
 
     # Generate test data for specific n
     test_texts, test_labels = generate_test_data_for_n(n)
 
     print(f"\n==== TESTING MODEL ON STRINGS WITH n={n} ====")
-    print(f"Testing on {len(test_texts)} examples ({len(test_texts)//2} valid, {len(test_texts)//2} invalid)")
+    print(f"Testing on {len(test_texts)} examples "
+          f"({len(test_texts)//2} valid, {len(test_texts)//2} invalid)")
 
     # Track metrics
     total_correct = 0
@@ -820,7 +895,7 @@ def test_N(model, n, batch_size=32):
             batch_labels = torch.tensor(test_labels[i:i+batch_size], dtype=torch.float32)
 
             # Get predictions
-            outputs = model(batch_texts)
+            outputs = model_instance(batch_texts)
             predictions = (outputs > 0.5).float()
 
             # Store results
@@ -861,9 +936,11 @@ def test_N(model, n, batch_size=32):
     invalid_accuracy = sum(1 for r in invalid_results if r['correct']) / len(invalid_results)
 
     print(f"Valid String Accuracy: {valid_accuracy:.4f} "
-          f"({sum(1 for r in valid_results if r['correct'])}/{len(valid_results)})")
+          f"({sum(1 for r in valid_results if r['correct'])}/"
+          f"{len(valid_results)})")
     print(f"Invalid String Accuracy: {invalid_accuracy:.4f} "
-          f"({sum(1 for r in invalid_results if r['correct'])}/{len(invalid_results)})")
+          f"({sum(1 for r in invalid_results if r['correct'])}/"
+          f"{len(invalid_results)})")
 
     return accuracy
 
@@ -874,7 +951,7 @@ def demonstrate_anbnan_classifier():
     print("\n==== IMPROVED a^n b^n a^n LANGUAGE CLASSIFIER ====")
 
     # Create model with enhanced architecture
-    model = AnBnAnClassifier(
+    model_instance = AnBnAnClassifier(
         d_model=128,          # Increased from 64 to 128
         num_heads=8,          # Increased from 4 to 8 heads
         d_ff=256,            # Increased from 128 to 256
@@ -883,8 +960,8 @@ def demonstrate_anbnan_classifier():
     )
 
     # Train model with more epochs and smaller batch size
-    model, history = train_model(
-        model=model,
+    model_instance, training_history = train_model(
+        model_instance,
         num_epochs=10,       # Increased from 5 to 10
         batch_size=16,       # Decreased from 32 to 16
         learning_rate=0.0005  # Decreased from 0.001 to 0.0005
@@ -892,17 +969,17 @@ def demonstrate_anbnan_classifier():
 
     # Evaluate model on large-scale test set
     print("\nEvaluating on large-scale test set:")
-    large_scale_accuracy = evaluate_model_large_scale(model)
+    large_scale_accuracy = evaluate_model_large_scale(model_instance)
 
     # Test model on specific values of n
     test_ns = [1, 2, 3, 5, 10]
     n_accuracies = {}
     for n in test_ns:
-        n_accuracies[n] = test_N(model, n)
+        n_accuracies[n] = test_n(model_instance, n)
 
     # Print final summary
     print("\n==== FINAL SUMMARY ====")
-    print(f"Training Accuracy: {history['accuracy'][-1]:.4f}")
+    print(f"Training Accuracy: {training_history['accuracy'][-1]:.4f}")
     print(f"Large-Scale Test Accuracy: {large_scale_accuracy:.4f}")
     print("\nAccuracy by n value:")
     for n, acc in n_accuracies.items():
@@ -916,13 +993,13 @@ def demonstrate_anbnan_classifier():
 
         # Training metrics
         plt.subplot(1, 3, 1)
-        plt.plot(history['loss'])
+        plt.plot(training_history['loss'])
         plt.title('Training Loss')
         plt.xlabel('Epoch')
         plt.ylabel('Loss')
 
         plt.subplot(1, 3, 2)
-        plt.plot(history['accuracy'])
+        plt.plot(training_history['accuracy'])
         plt.title('Training Accuracy')
         plt.xlabel('Epoch')
         plt.ylabel('Accuracy')
@@ -945,6 +1022,9 @@ def demonstrate_anbnan_classifier():
 if __name__ == "__main__":
     demonstrate_anbnan_classifier()
 
-    model = AnBnAnClassifier(d_model=64, num_heads=4, num_layers=1)
-    model, history = train_model(model, num_epochs=3, batch_size=16)
-    evaluate_model_large_scale(model)
+    if TORCH_AVAILABLE:
+        model_instance = AnBnAnClassifier(d_model=64, num_heads=4, num_layers=1)
+        model_instance, training_history = train_model(model_instance, num_epochs=3, batch_size=16)
+        evaluate_model_large_scale(model_instance)
+    else:
+        print("Cannot run demonstration without PyTorch.")

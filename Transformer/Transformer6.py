@@ -1,5 +1,29 @@
-import torch
-import torch.nn as nn
+"""
+Advanced Transformer Implementation for a^n b^n a^n Language Classification
+
+This module implements a complete Transformer architecture specifically designed for
+classifying strings that belong to the context-free language a^n b^n a^n. It includes
+custom embedding layers, multi-head self-attention, positional encoding, and a
+comprehensive training and evaluation framework.
+
+Key Features:
+- Custom AnBnAnEmbedding for specialized token representation
+- Multi-head self-attention mechanism
+- Positional encoding for sequence understanding
+- Complete training pipeline with data generation
+- Comprehensive evaluation and testing framework
+
+Key Skills: PyTorch, Transformers, Attention Mechanisms, Language Classification, Deep Learning
+"""
+
+try:
+    import torch
+    import torch.nn as nn
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    print("Warning: PyTorch not available. Please install: pip install torch")
+
 import numpy as np
 
 class PositionalEncoding(nn.Module):
@@ -523,8 +547,8 @@ def train_model(model, num_epochs=10, batch_size=32, learning_rate=0.001):
         'accuracy': []
     }
 
-    # Number of batches
-    num_batches = len(train_texts) // batch_size
+    # Number of batches (commented out as it's not used)
+    # num_batches = len(train_texts) // batch_size
 
     print(f"Training model on {len(train_texts)} examples for {num_epochs} epochs...")
 
@@ -703,7 +727,7 @@ def evaluate_model_large_scale(model, batch_size=64):
             total_samples += len(batch_texts)
 
             # Update pattern metrics
-            for j, (text, label, pred) in enumerate(zip(batch_texts, batch_labels, predictions)):
+            for _, (text, label, pred) in enumerate(zip(batch_texts, batch_labels, predictions)):
                 pattern_type = 'valid' if label == 1 else 'invalid'
                 pattern_metrics[pattern_type]['total'] += 1
                 if label == pred:
@@ -765,7 +789,7 @@ def demonstrate_anbnan_classifier():
 
     # Evaluate model on both small and large test sets
     print("\nEvaluating on standard test set:")
-    standard_accuracy = evaluate_model(model)
+    standard_accuracy = evaluate_model_large_scale(model)
 
     print("\nEvaluating on large-scale test set:")
     large_scale_accuracy = evaluate_model_large_scale(model)

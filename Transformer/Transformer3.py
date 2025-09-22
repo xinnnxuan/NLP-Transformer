@@ -1,5 +1,21 @@
-import torch
-import torch.nn as nn
+"""
+Intermediate Transformer Implementation for a^n b^n a^n Language
+
+This module implements intermediate Transformer components for the a^n b^n a^n language
+classification task, including positional encoding, custom embeddings, multi-head
+self-attention, and feed-forward networks.
+
+Key Skills: PyTorch, Transformers, Attention Mechanisms, Language Classification
+"""
+
+try:
+    import torch
+    import torch.nn as nn
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    print("Warning: PyTorch not available. Please install: pip install torch")
+
 import numpy as np
 
 class PositionalEncoding(nn.Module):

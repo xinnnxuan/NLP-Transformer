@@ -1,5 +1,21 @@
-import torch
-import torch.nn as nn
+"""
+Complete Transformer Implementation for a^n b^n a^n Language
+
+This module implements a complete Transformer architecture for the a^n b^n a^n language
+classification task, including all components from basic to advanced features with
+comprehensive training and evaluation capabilities.
+
+Key Skills: PyTorch, Transformers, Attention Mechanisms, Language Classification
+"""
+
+try:
+    import torch
+    import torch.nn as nn
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    print("Warning: PyTorch not available. Please install: pip install torch")
+
 import numpy as np
 
 class PositionalEncoding(nn.Module):

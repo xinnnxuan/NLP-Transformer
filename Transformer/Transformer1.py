@@ -1,13 +1,43 @@
-import torch
-import torch.nn as nn
+"""
+Basic Transformer Components for a^n b^n a^n Language
+
+This module implements basic Transformer components including positional encoding
+and custom embedding layers specifically designed for the a^n b^n a^n language
+classification task.
+
+Key Features:
+- Positional encoding for sequence understanding
+- Custom AnBnAnEmbedding for specialized token representation
+- Tokenization for a^n b^n a^n language patterns
+
+Key Skills: PyTorch, Transformers, Embeddings, Positional Encoding, Deep Learning
+"""
+
+try:
+    import torch
+    import torch.nn as nn
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    print("Warning: PyTorch not available. Please install: pip install torch")
+
 import numpy as np
 
 class PositionalEncoding(nn.Module):
+    """
+    Positional encoding layer for Transformer models.
+    
+    This class implements the sinusoidal positional encoding used in the original
+    Transformer paper to provide position information to the model.
+    """
+    
     def __init__(self, d_model, max_seq_length=100):
         """
-        Initialize positional encoding
-        d_model: dimension of the model
-        max_seq_length: maximum length of sequences
+        Initialize positional encoding.
+        
+        Args:
+            d_model (int): Dimension of the model
+            max_seq_length (int): Maximum length of sequences
         """
         super().__init__()
 
@@ -28,10 +58,19 @@ class PositionalEncoding(nn.Module):
         return x + self.pe[:x.size(1)]
 
 class AnBnAnEmbedding(nn.Module):
+    """
+    Custom embedding layer for a^n b^n a^n language classification.
+    
+    This embedding layer is specifically designed to handle the tokenization
+    and embedding of strings in the a^n b^n a^n language.
+    """
+    
     def __init__(self, d_model=64):
         """
-        Custom embedding for a^n b^n a^n language
-        d_model: dimension of the embedding vectors
+        Initialize the embedding layer.
+        
+        Args:
+            d_model (int): Dimension of the embedding vectors
         """
         super().__init__()
         self.d_model = d_model
@@ -43,8 +82,13 @@ class AnBnAnEmbedding(nn.Module):
 
     def tokenize(self, text):
         """
-        Convert text to token indices
-        Returns: tensor of token indices
+        Convert text to token indices.
+        
+        Args:
+            text (str): Input text to tokenize
+            
+        Returns:
+            torch.Tensor: Tensor of token indices
         """
         # Find the first character (will be 'a')
         a_char = text[0]
@@ -65,9 +109,13 @@ class AnBnAnEmbedding(nn.Module):
 
     def forward(self, text_batch):
         """
-        Convert batch of strings to embedded tensors
-        text_batch: list of strings
-        Returns: tensor of shape [batch_size, seq_length, d_model]
+        Convert batch of strings to embedded tensors.
+        
+        Args:
+            text_batch (list): List of strings to process
+            
+        Returns:
+            torch.Tensor: Tensor of shape [batch_size, seq_length, d_model]
         """
         # Convert texts to token indices
         token_indices = [self.tokenize(text) for text in text_batch]
@@ -87,6 +135,13 @@ class AnBnAnEmbedding(nn.Module):
         return embeddings
 
 def test_embedding():
+    """
+    Test the embedding layer with sample strings.
+    """
+    if not TORCH_AVAILABLE:
+        print("Cannot run test without PyTorch.")
+        return
+        
     # Create embedding layer
     embedding = AnBnAnEmbedding(d_model=64)
 
@@ -110,5 +165,14 @@ def test_embedding():
         print(f"Embedding shape for this string: {embeddings[i].shape}")
         print(f"First few values of embedding: {embeddings[i][0][:5]}")
 
-if __name__ == "__main__":
+
+def main():
+    """
+    Main function to demonstrate the embedding layer.
+    """
+    print("\n==== BASIC TRANSFORMER COMPONENTS DEMO ====")
     test_embedding()
+
+
+if __name__ == "__main__":
+    main()

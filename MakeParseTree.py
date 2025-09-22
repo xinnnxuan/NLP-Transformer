@@ -1,9 +1,28 @@
-import spacy
-import nltk
-from nltk.tree import Tree
+"""
+Make Parse Trees
+
+Developed a Python program that parses sentences into dependency or constituency trees 
+using NLP libraries like spacy, NLTK, or diaparser. Visualized tree structures for 10 
+sample sentences to illustrate syntactic parsing.
+
+
+Key Skills: Parsing, dependency trees, sentence structure analysis, spacy, NLTK, tree visualization
+"""
+
+try:
+    import spacy
+    from nltk.tree import Tree
+    SPACY_AVAILABLE = True
+except ImportError:
+    SPACY_AVAILABLE = False
+    print("Warning: spaCy and NLTK not available. Please install: pip install spacy nltk")
+    print("Also download the English model: python -m spacy download en_core_web_sm")
 
 # Load the small English NLP model
-nlp = spacy.load("en_core_web_sm")
+if SPACY_AVAILABLE:
+    nlp = spacy.load("en_core_web_sm")
+else:
+    nlp = None
 
 def token_to_tree(token):
     """
@@ -17,6 +36,10 @@ def generate_pretty_dependency_tree(sentence):
     """
     Generate and display a dependency tree in a human-readable format.
     """
+    if not SPACY_AVAILABLE or nlp is None:
+        print(f"\nCannot generate tree for: '{sentence}' - spaCy not available")
+        return
+
     doc = nlp(sentence)
     root = [token for token in doc if token.head == token][0]  # Find the root token
     tree = token_to_tree(root)
@@ -39,6 +62,18 @@ sentences = [
     "Creativity and hard work lead to success."
 ]
 
-# Generate and display dependency trees for each sentence
-for sentence in sentences:
-    generate_pretty_dependency_tree(sentence)
+def main():
+    """
+    Main function to generate and display dependency trees.
+    """
+    if not SPACY_AVAILABLE:
+        print("Cannot run demonstration without spaCy and NLTK.")
+        return
+
+    # Generate and display dependency trees for each sentence
+    for sentence in sentences:
+        generate_pretty_dependency_tree(sentence)
+
+
+if __name__ == "__main__":
+    main()

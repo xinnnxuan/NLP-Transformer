@@ -1,13 +1,40 @@
-import torch
-from transformers import AutoTokenizer, AutoModel
+"""
+Contextual Word Vectors using BERT
+
+This module demonstrates how to generate contextual word vectors using BERT (Bidirectional
+Encoder Representations from Transformers) and compute similarity matrices between words.
+It shows how the same word can have different vector representations in different contexts.
+
+Key Skills: BERT, Transformers, Word Embeddings, Cosine Similarity, Contextual Vectors
+"""
+
+try:
+    import torch
+    from transformers import AutoTokenizer, AutoModel
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    print("Warning: PyTorch and transformers not available. "
+          "Please install: pip install torch transformers")
+
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 
 def get_contextual_vectors(sentence):
     """
-    Generate contextual vectors for each word in a sentence using BERT
+    Generate contextual vectors for each word in a sentence using BERT.
+    
+    Args:
+        sentence (str): Input sentence to process
+        
+    Returns:
+        tuple: (words, vectors) where words is a list of tokenized words
+               and vectors is a numpy array of contextual embeddings
     """
+    if not TORCH_AVAILABLE:
+        print("PyTorch and transformers not available. Cannot generate vectors.")
+        return [], np.array([])
     # Load pre-trained model and tokenizer
     tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
     model = AutoModel.from_pretrained('bert-base-uncased')
@@ -34,7 +61,11 @@ def get_contextual_vectors(sentence):
 
 def print_similarity_matrix(words, vectors):
     """
-    Compute and print the similarity matrix between words
+    Compute and print the similarity matrix between words.
+    
+    Args:
+        words (list): List of words
+        vectors (numpy.ndarray): Word vectors
     """
     # Compute cosine similarity
     similarity_matrix = cosine_similarity(vectors)
@@ -48,7 +79,12 @@ def print_similarity_matrix(words, vectors):
 
 def compare_word_in_contexts(sentence1, sentence2, target_word):
     """
-    Compare the contextual vectors of the same word in different sentences
+    Compare the contextual vectors of the same word in different sentences.
+    
+    Args:
+        sentence1 (str): First sentence
+        sentence2 (str): Second sentence
+        target_word (str): Word to compare between contexts
     """
     # Get vectors for both sentences
     words1, vectors1 = get_contextual_vectors(sentence1)
@@ -79,6 +115,12 @@ def compare_word_in_contexts(sentence1, sentence2, target_word):
         print(f"Could not find '{target_word}' in both sentences")
 
 def main():
+    """
+    Main function to demonstrate contextual word vector analysis.
+    """
+    if not TORCH_AVAILABLE:
+        print("Cannot run demonstration without PyTorch and transformers.")
+        return
     # Example sentences
     sentences = [
         "The cat sits on the mat",
